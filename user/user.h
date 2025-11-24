@@ -42,6 +42,7 @@ void *memcpy(void *, const void *, uint);
 char* strcat(char*, const char*);
 int isdir(char*);
 char* joinpath(char*, char*, char*, int);
+int moveStuff(char*, char*, int, char*);
 
 // umalloc.c
 void* malloc(uint);
