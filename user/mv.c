@@ -2,51 +2,6 @@
 #include "kernel/stat.h"
 #include "user/user.h"
 
-char *strcat(char *dst, const char *src)
-{
-  char *p = dst;
-
-  while (*p)
-    p++;
-
-  // copy src into dst starting at the end
-  while (*src)
-  {
-    *p = *src;
-    p++;
-    src++;
-  }
-
-  *p = 0;
-
-  return dst;
-}
-
-int is_dir(char *path)
-{
-  struct stat st;
-  if (stat(path, &st) < 0)
-    return 0;
-  return st.type == T_DIR;
-}
-
-char *join_path(char *dir, char *filename, char *out_buffer, int bufsize)
-{
-  int dn = strlen(dir);
-  int nn = strlen(filename);
-  int need = dn + 1 + nn + 1;
-  if (need > bufsize)
-    return 0;
-  strcpy(out_buffer, dir);
-  if (dir[dn - 1] != '/')
-  {
-    out_buffer[dn] = '/';
-    out_buffer[dn + 1] = 0;
-  }
-  strcat(out_buffer, filename);
-  return out_buffer;
-}
-
 /*mv src dst*/
 int main(int argc, char *argv[])
 {
@@ -57,9 +12,9 @@ int main(int argc, char *argv[])
   }
 
   char *src = argv[1];
-  int is_src_dir = is_dir(src);
+  int is_src_dir = isdir(src);
   char *dst = argv[2];
-  int is_dst_dir = is_dir(dst);
+  int is_dst_dir = isdir(dst);
 
   char dst_path[500];
   strcpy(dst_path, dst);
@@ -81,7 +36,7 @@ int main(int argc, char *argv[])
   // File to File
   if (!is_src_dir && is_dst_dir)
   {
-    join_path(dst, filename, dst_path, sizeof(dst_path));
+    joinpath(dst, filename, dst_path, sizeof(dst_path));
     printf("New path: %s, %s\n", filename, dst_path);
   }
 

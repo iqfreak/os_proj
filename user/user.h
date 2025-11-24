@@ -39,6 +39,10 @@ int atoi(const char*);
 int memcmp(const void *, const void *, uint);
 void *memcpy(void *, const void *, uint);
 
+char* strcat(char*, const char*);
+int isdir(char*);
+char* joinpath(char*, char*, char*, int);
+
 // umalloc.c
 void* malloc(uint);
 void free(void*);
