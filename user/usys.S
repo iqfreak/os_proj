@@ -105,8 +105,3 @@ uptime:
  li a7, SYS_uptime
  ecall
  ret
-.global get_keystrokes_count
-get_keystrokes_count:
- li a7, SYS_get_keystrokes_count
- ecall
- ret

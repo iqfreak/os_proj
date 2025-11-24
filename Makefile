@@ -139,12 +139,9 @@ UPROGS=\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\
-	$U/_add\
 	$U/_sleep\
-	$U/_kbdcount\
 	$U/_mv\
 	$U/_touch\
-
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)

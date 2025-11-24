@@ -21,7 +21,6 @@ void            bunpin(struct buf*);
 void            consoleinit(void);
 void            consoleintr(int);
 void            consputc(int);
-uint64 get_keystrokes_count(void);
 
 // exec.c
 int             exec(char*, char**);
