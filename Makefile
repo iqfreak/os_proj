@@ -143,6 +143,8 @@ UPROGS=\
 	$U/_sleep\
 	$U/_kbdcount\
 	$U/_mv\
+	$U/_touch\
+
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
