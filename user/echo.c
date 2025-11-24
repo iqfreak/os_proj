@@ -15,7 +15,5 @@ main(int argc, char *argv[])
       write(1, "\n", 1);
     }
   }
-
-  write(1, "ZeyadCode Is Here\n", strlen("ZeyadCode Is Here\n"));
   exit(0);
 }
