@@ -96,6 +96,8 @@ int stat(const char *n, struct stat *st)
 int atoi(const char *s)
 {
   int n;
+  if (*s=='-')
+   return -atoi(s+1);
 
   n = 0;
   while ('0' <= *s && *s <= '9')

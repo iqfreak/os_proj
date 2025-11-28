@@ -9,6 +9,7 @@ char buf[1024];
 int match(char*, char*);
 
 void
+
 grep(char *pattern, int fd)
 {
   int n, m;
@@ -104,4 +105,3 @@ int matchstar(int c, char *re, char *text)
   }while(*text!='\0' && (*text++==c || c=='.'));
   return 0;
 }
-
