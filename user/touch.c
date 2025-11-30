@@ -6,10 +6,15 @@
 int
 main(int argc, char *argv[])
 {
-    if(argc < 2){
-        printf("usage: create <filename>\n");
-
+    if (argc == 2 && argv[1][0] == '?' && argv[1][1] == '\0') {
+        printf("Usage: touch <filename>\n");
+        return 0;
     }
+
+    if(argc != 2) {
+        printf("Incorrect usage, touch <filename>");
+    }
+
 
     char *path = argv[1];
     int fd;

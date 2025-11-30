@@ -55,3 +55,14 @@ void free(void *);
 int move(char *src, char *dst, int shouldDelete);
 int moveDir(char *src, char *dst, int shouldDelete);
 int moveFile(char *src, char *dst, int shouldDelete);
+
+struct opt {
+    char opt;    // short option char, e.g. 'n' or 'f'
+    int has_arg; // 0 = flag, 1 = option requires argument
+    int seen;    // set to 1 by parser if option appeared
+    char *arg;   // pointer to option argument (NULL if none)
+};
+
+int parse_flags(int argc, char **argv, struct opt *opts, int nopts);
+int parse_nonneg_int(const char *s); // helper to convert option args
+int strip_flags(int argc, char **argv, const char *opts_with_arg);

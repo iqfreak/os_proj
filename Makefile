@@ -141,6 +141,7 @@ UPROGS=\
 	$U/_zombie\
 	$U/_sleep\
 	$U/_mv\
+	$U/_tail\
 	$U/_cp\
 	$U/_touch\
 	$U/_add\
