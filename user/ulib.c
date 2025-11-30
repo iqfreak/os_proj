@@ -192,52 +192,13 @@ char *joinpath(char *dir, char *filename, char *out_buffer, int bufsize)
   return out_buffer;
 }
 
-int moveStuff(char *src, char *dst, int shouldDelete, char* err_msg)
+char *getFilename(char *path)
 {
-  int is_src_dir = isdir(src);
-  int is_dst_dir = isdir(dst);
-
-  char dst_path[500];
-  strcpy(dst_path, dst);
-  char *filename = src;
-
-  // Dir to dir
-  if (is_src_dir)
-  {
-    err_msg = "mv: direcotry to directory isn't implemented yet\n";
-    return -1;
-  }
-
-  for (char *p = src; *p; p++)
+  char *dirname = path;
+  for (char *p = path; *p; p++)
   {
     if (*p == '/')
-      filename = p + 1;
+      dirname = p + 1;
   }
-
-  // File to File
-  if (!is_src_dir && is_dst_dir)
-  {
-    joinpath(dst, filename, dst_path, sizeof(dst_path));
-  }
-
-  if (link(src, dst_path) < 0)
-  {
-    err_msg = "mv: link src %s to dst %s failed\n";
-    return -1;
-  }
-
-  if (shouldDelete)
-  {
-    if (unlink(src) < 0)
-    {
-      err_msg = "mv: unlink %s failed\n";
-      if (unlink(dst_path) < 0)
-      {
-        err_msg = "mv: rollback failed for %s\n";
-      }
-      return -1;
-    }
-  }
-
-  return 0;
+  return dirname;
 }
