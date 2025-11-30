@@ -1,6 +1,8 @@
 *~
+# please work...
 user/*
 !user/*.*
+
 _*
 *.o
 *.d
