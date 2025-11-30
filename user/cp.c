@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  // int statusCode = moveStuff(argv[1], argv[2], 0, err_msg);
+  // int statusCode = move(argv[1], argv[2], 0, err_msg);
   // if (statusCode < 0)
   // {
   //   fprintf(2, "%s", err_msg);

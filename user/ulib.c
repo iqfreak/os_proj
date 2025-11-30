@@ -1,4 +1,5 @@
 #include "kernel/fcntl.h"
+#include "kernel/fs.h"
 #include "kernel/stat.h"
 #include "kernel/types.h"
 #include "user/user.h"
@@ -26,6 +27,24 @@ int strcmp(const char *p, const char *q) {
     while (*p && *p == *q)
         p++, q++;
     return (uchar)*p - (uchar)*q;
+}
+
+int strncmp(const char *p, const char *q, int len) {
+    if (len <= 0)
+        return 0;
+
+    const unsigned char *a = (const unsigned char *)p;
+    const unsigned char *b = (const unsigned char *)q;
+
+    while (len-- > 0) {
+        if (*a != *b)
+            return (int)(*a) - (int)(*b);
+        if (*a == '\0')
+            return 0;
+        a++;
+        b++;
+    }
+    return 0;
 }
 
 uint strlen(const char *s) {
