@@ -143,9 +143,14 @@ UPROGS=\
 	$U/_mv\
 	$U/_cp\
 	$U/_touch\
+	$U/_add\
+	$U/_fact\
+	$U/_diff\
 
-fs.img: mkfs/mkfs README $(UPROGS)
-	mkfs/mkfs fs.img README $(UPROGS)
+
+
+fs.img: mkfs/mkfs README $(UPROGS) user/file1.txt user/file2.txt
+	mkfs/mkfs fs.img README $(UPROGS) user/file1.txt user/file2.txt
 
 -include kernel/*.d user/*.d
 

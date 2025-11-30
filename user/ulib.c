@@ -102,8 +102,11 @@ int stat(const char *n, struct stat *st) {
     return r;
 }
 
-int atoi(const char *s) {
-    int n;
+int atoi(const char *s)
+{
+  int n;
+  if (*s=='-')
+   return -atoi(s+1);
 
     n = 0;
     while ('0' <= *s && *s <= '9')
