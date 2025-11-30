@@ -6,8 +6,11 @@
 
 // mkdir a; mkdir b; touch a/a_file.txt
 int MAX_PATH_LEN = 700;
-int moveStuff(char *, char *, int);
 int DEBUG = 1;
+
+int moveStuff(char *src, char *dst, int shouldDelete);
+int moveDir(char *src, char *dst, int shouldDelete);
+int moveFile(char *src, char *dst, int shouldDelete);
 
 int main(int argc, char *argv[]) {
     if (argc != 3) {
@@ -24,117 +27,103 @@ int main(int argc, char *argv[]) {
 
 int moveStuff(char *src, char *dst, int shouldDelete) {
     if (!isdir(dst)) {
-        pritnf("mv: dst must be a directory");
+        printf("mv: dst must be a directory");
         return -1;
     }
 
     else if (isdir(src)) {
-        return move_dir(src, dst, shouldDelete);
+        return moveDir(src, dst, shouldDelete);
     } else {
-        return move_dir(src, dst, shouldDelete);
+        return moveFile(src, dst, shouldDelete);
+    }
+}
+
+int moveDir(char *src, char *dst, int shouldDelete) {
+    // Create destination path: dst/dirname
+    char *filename = getFilename(src);
+    char *new_dst = malloc(MAX_PATH_LEN);
+    joinpath(dst, filename, new_dst, MAX_PATH_LEN);
+
+    // Create the destination directory
+    if (mkdir(new_dst) < 0) {
+        fprintf(2, "mv: mkdir failed\n");
+        return -1;
     }
 
+    if (DEBUG)
+        printf("1 made directory at %s\n", new_dst);
+
+    // Open source directory to read its contents
+    int fd = open(src, O_RDONLY);
+    if (fd < 0) {
+        fprintf(2, "mv: open source directory failed\n");
+        unlink(new_dst); // Cleanup created directory
+        return -1;
+    }
+
+    if (DEBUG)
+        printf("2, opened %s to read content\n", src);
+
+    // Read each directory
+    struct dirent de;
+    while (read(fd, &de, sizeof(de)) == sizeof(de)) {
+        if (de.inum == 0)
+            continue; // Skip empty entries
+        if (strcmp(de.name, ".") == 0 || strcmp(de.name, "..") == 0)
+            continue; // Skip special entries
+
+        char *item_src = malloc(MAX_PATH_LEN);
+        joinpath(src, de.name, item_src, MAX_PATH_LEN);
+        if (DEBUG)
+            printf("3. item src: %s, item dst: %s, shouldDelete: %d\n", item_src, new_dst, shouldDelete);
+
+        // Recursive call
+        if (moveStuff(item_src, new_dst, shouldDelete) < 0) {
+            close(fd);
+
+            // Cleanup on failure
+            unlink(new_dst);
+            free(item_src);
+            free(new_dst);
+
+            if (DEBUG)
+                printf("Welp that call failed\n");
+
+            return -1;
+        }
+        free(item_src);
+        free(new_dst);
+    }
+    close(fd);
+
+    if (shouldDelete && unlink(src) < 0) {
+        fprintf(2, "mv: unlink source directory failed\n");
+        return -1;
+    }
+
+    printf("5. this Subcall done succesfully\n");
     return 0;
 }
 
-int moveStuff(char *src, char *dst, int shouldDelete) {
-    printf("called\n");
-    if (shouldDelete >= 10) {
-        printf("termination time\n");
-        return 0;
-    }
-    int is_src_dir = isdir(src);
-    // int is_dst_dir = isdir(dst);
-
-    char *dst_path = malloc(MAX_PATH_LEN);
-    strcpy(dst_path, dst);
+int moveFile(char *src, char *dst, int shouldDelete) {
     char *filename = getFilename(src);
 
-    // Dir to dir
-    if (is_src_dir) {
-        // Create destination path: dst/dirname
-        char *new_dst = malloc(MAX_PATH_LEN);
-        joinpath(dst, filename, new_dst, MAX_PATH_LEN);
-
-        // Create the destination directory
-        if (mkdir(new_dst) < 0) {
-            fprintf(2, "mv: mkdir failed\n");
-            return -1;
-        }
-
-        if (DEBUG)
-            printf("1 made directory at %s\n", new_dst);
-
-        // Open source directory to read its contents
-        int fd = open(src, O_RDONLY);
-        if (fd < 0) {
-            fprintf(2, "mv: open source directory failed\n");
-            unlink(new_dst); // Cleanup created directory
-            return -1;
-        }
-
-        if (DEBUG)
-            printf("2, opened %s to read content\n", src);
-
-        // Read each directory
-        struct dirent de;
-        while (read(fd, &de, sizeof(de)) == sizeof(de)) {
-            if (de.inum == 0)
-                continue; // Skip empty entries
-            if (strcmp(de.name, ".") == 0 || strcmp(de.name, "..") == 0)
-                continue; // Skip special entries
-
-            char *item_src = malloc(MAX_PATH_LEN);
-            joinpath(src, de.name, item_src, MAX_PATH_LEN);
-            if (DEBUG)
-                printf("3. item src: %s, item dst: %s, shouldDelete: %d\n", item_src, new_dst, shouldDelete);
-
-            // Recursive call
-            if (moveStuff(item_src, new_dst, shouldDelete) < 0) {
-                close(fd);
-                unlink(new_dst); // Cleanup on failure
-
-                if (DEBUG)
-                    printf("Welp that call failed\n");
-
-                free(item_src);
-                free(dst_path);
-                return -1;
-            }
-            free(item_src);
-            printf("4\n");
-        }
-        close(fd);
-
-        if (shouldDelete && unlink(src) < 0) {
-            fprintf(2, "mv: unlink source directory failed\n");
-            return -1;
-        }
-
-        printf("5. this Subcall done succesfully\n");
-        free(dst_path);
-        return 0;
-    }
-
-    joinpath(dst, filename, dst_path, MAX_PATH_LEN);
-    if (link(src, dst_path) < 0) {
-        fprintf(2, "mv: link src %s to dst %s failed\n", src, dst_path);
-        free(dst_path);
+    joinpath(dst, filename, dst, MAX_PATH_LEN);
+    if (link(src, dst) < 0) {
+        fprintf(2, "mv: link src %s to dst %s failed\n", src, dst);
         return -1;
     }
-    printf("done linking %s to %s\n", src, dst_path);
+    printf("done linking %s to %s\n", src, dst);
 
     if (shouldDelete) {
         if (unlink(src) < 0) {
             fprintf(2, "mv: unlink %s failed\n", src);
-            if (unlink(dst_path) < 0)
-                fprintf(2, "mv: rollback failed for %s\n", dst_path);
+            if (unlink(dst) < 0)
+                fprintf(2, "mv: rollback failed for %s\n", dst);
 
-            free(dst_path);
             return -1;
         }
     }
 
-    free(dst_path);
     return 0;
 }
