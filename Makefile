@@ -148,6 +148,7 @@ UPROGS=\
 	$U/_fact\
 	$U/_diff\
 	$U/_find\
+	$U/_wce\
 
 
 
