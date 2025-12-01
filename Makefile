@@ -147,6 +147,7 @@ UPROGS=\
 	$U/_add\
 	$U/_fact\
 	$U/_diff\
+	$U/_find\
 
 
 
