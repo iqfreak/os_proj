@@ -83,7 +83,12 @@ sys_uptime(void) {
     return xticks;
 }
 
-uint64 sys_shutdown(void) {
-    printf("Shutting down...");
-    return 0;
+uint64
+sys_shutdown(void)
+{
+  printf("Goodbye world, i will miss living :'(...\n");
+  volatile uint32 *qemu_shutdown = (volatile uint32 *)0x100000;
+  *qemu_shutdown = 0x5555;
+  for(;;);
+  return 0;
 }
