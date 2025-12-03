@@ -111,12 +111,14 @@ uint64 sys_getptable(void) {
         uint64 sz;
     };
 
-
     extern struct proc proc[NPROC];
     struct proc *p;
 
     struct pinfo ptable[NPROC];
     int count = 0;
+
+    uint64 addr;
+    argaddr(0, &addr);
 
     for (p = proc; p < &proc[NPROC]; p++) {
         acquire(&p->lock);
@@ -135,6 +137,9 @@ uint64 sys_getptable(void) {
         ++count;
         release(&p->lock);
     }
+
+    if (copyout(myproc()->pagetable, addr, (char *)ptable, count * sizeof(struct pinfo)) < 0)
+        return -1;
 
     return count;
 }

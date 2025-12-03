@@ -2,6 +2,21 @@
 
 struct stat;
 
+struct opt {
+    char opt;    // short option char, e.g. 'n' or 'f'
+    int has_arg; // 0 = flag, 1 = option requires argument
+    int seen;    // set to 1 by parser if option appeared
+    char *arg;   // pointer to option argument (NULL if none)
+};
+
+struct pinfo {
+    int pid;
+    int ppid;
+    int state;
+    char name[16];
+    uint64 sz;
+};
+
 // system calls
 int fork(void);
 int exit(int) __attribute__((noreturn));
@@ -27,7 +42,7 @@ int uptime(void);
 int get_keystrokes_count(void);
 int shutdown(void);
 int countsyscall(void);
-int getptable(void);
+int getptable(struct pinfo*);
 
 // ulib.c
 int stat(const char *, struct stat *);
@@ -58,21 +73,6 @@ void free(void *);
 int move(char *src, char *dst, int shouldDelete);
 int moveDir(char *src, char *dst, int shouldDelete);
 int moveFile(char *src, char *dst, int shouldDelete);
-
-struct opt {
-    char opt;    // short option char, e.g. 'n' or 'f'
-    int has_arg; // 0 = flag, 1 = option requires argument
-    int seen;    // set to 1 by parser if option appeared
-    char *arg;   // pointer to option argument (NULL if none)
-};
-
-struct pinfo {
-    int pid;
-    int ppid;
-    int state;
-    char name[16];
-    uint64 sz;
-};
 
 int parse_flags(int argc, char **argv, struct opt *opts, int nopts);
 int parse_nonneg_int(const char *s); // helper to convert option args
