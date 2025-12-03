@@ -38,3 +38,4 @@ entry("sleep");
 entry("uptime");
 entry("shutdown");
 entry("countsyscall");
+entry("getptable");

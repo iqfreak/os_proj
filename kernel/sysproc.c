@@ -1,5 +1,4 @@
 #include "defs.h"
-#include "spinlock.h"
 #include "memlayout.h"
 #include "param.h"
 #include "proc.h"
@@ -99,6 +98,43 @@ uint64 sys_countsyscall(void) {
     acquire(&syscallLock);
     count = syscallCount;
     release(&syscallLock);
+
+    return count;
+}
+
+uint64 sys_getptable(void) {
+    struct pinfo {
+        int pid;
+        int ppid;
+        int state;
+        char name[16];
+        uint64 sz;
+    };
+
+
+    extern struct proc proc[NPROC];
+    struct proc *p;
+
+    struct pinfo ptable[NPROC];
+    int count = 0;
+
+    for (p = proc; p < &proc[NPROC]; p++) {
+        acquire(&p->lock);
+
+        if (p->state == UNUSED) {
+            release(&p->lock);
+            continue;
+        }
+
+        ptable[count].pid = p->pid;
+        ptable[count].ppid = p->parent ? p->parent->pid : 0;
+        ptable[count].state = p->state;
+        safestrcpy(ptable[count].name, p->name, sizeof(ptable[count].name));
+        ptable[count].sz = p->sz;
+
+        ++count;
+        release(&p->lock);
+    }
 
     return count;
 }

@@ -151,7 +151,7 @@ UPROGS=\
 	$U/_wce\
 	$U/_shutdown\
 	$U/_countsyscall\
-
+	$U/_ps\
 
 
 fs.img: mkfs/mkfs README $(UPROGS) user/file1.txt user/file2.txt

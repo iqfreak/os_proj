@@ -115,3 +115,8 @@ countsyscall:
  li a7, SYS_countsyscall
  ecall
  ret
+.global getptable
+getptable:
+ li a7, SYS_getptable
+ ecall
+ ret

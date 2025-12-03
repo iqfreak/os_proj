@@ -27,6 +27,7 @@ int uptime(void);
 int get_keystrokes_count(void);
 int shutdown(void);
 int countsyscall(void);
+int getptable(void);
 
 // ulib.c
 int stat(const char *, struct stat *);
@@ -63,6 +64,14 @@ struct opt {
     int has_arg; // 0 = flag, 1 = option requires argument
     int seen;    // set to 1 by parser if option appeared
     char *arg;   // pointer to option argument (NULL if none)
+};
+
+struct pinfo {
+    int pid;
+    int ppid;
+    int state;
+    char name[16];
+    uint64 sz;
 };
 
 int parse_flags(int argc, char **argv, struct opt *opts, int nopts);
