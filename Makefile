@@ -149,6 +149,7 @@ UPROGS=\
 	$U/_diff\
 	$U/_find\
 	$U/_wce\
+	$U/_shutdown\
 
 
 

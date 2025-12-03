@@ -1,3 +1,10 @@
+#pragma once
+
+#include "types.h"    // uint, uint64, uchar, ...
+#include "param.h"    // NCPU, NOFILE, etc.
+#include "spinlock.h" // defines struct spinlock
+#include "riscv.h"    // pagetable_t, pte_t, and uint64 typedefs on RISC-V
+
 // Saved registers for kernel context switches.
 struct context {
   uint64 ra;
