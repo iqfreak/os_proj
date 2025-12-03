@@ -143,3 +143,47 @@ uint64 sys_getptable(void) {
 
     return count;
 }
+
+uint64
+sys_get_proc_time(void) {
+    struct proc_time {
+        uint64 pid;
+        uint64 start_ticks;
+        uint64 total_ticks;
+        uint64 total_cycles;
+    };
+
+    int pid;
+    uint64 addr;
+    extern struct proc proc[NPROC];
+    struct proc *p;
+    struct proc_time pt;
+
+    // Extract arguments
+    argint(0, &pid);
+    argaddr(1, &addr);
+
+    // Find the process
+    for (p = proc; p < &proc[NPROC]; p++) {
+        acquire(&p->lock);
+        if (p->pid == pid && p->state != UNUSED) {
+            // Fill the struct
+            pt.pid = p->pid;
+            pt.start_ticks = p->start_ticks;
+            pt.total_ticks = p->total_ticks;
+            pt.total_cycles = r_time() - p->start_time;
+
+            // Copy to user space
+            if (copyout(myproc()->pagetable, addr, (char *)&pt, sizeof(pt)) < 0) {
+                release(&p->lock);
+                return -1;
+            }
+
+            release(&p->lock);
+            return 0;
+        }
+        release(&p->lock);
+    }
+
+    return -1; // Process not found
+}

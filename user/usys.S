@@ -120,3 +120,8 @@ getptable:
  li a7, SYS_getptable
  ecall
  ret
+.global get_proc_time
+get_proc_time:
+ li a7, SYS_get_proc_time
+ ecall
+ ret

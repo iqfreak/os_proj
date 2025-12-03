@@ -351,6 +351,11 @@ exit(int status)
   if(p == initproc)
     panic("init exiting");
 
+  // Calculate exectuion time
+  if(p->start_time != 0) {
+    p->total_ticks = ticks - p->start_ticks;
+  }
+
   // Close all open files.
   for(int fd = 0; fd < NOFILE; fd++){
     if(p->ofile[fd]){
@@ -463,6 +468,11 @@ scheduler(void)
         // before jumping back to us.
         p->state = RUNNING;
         c->proc = p;
+
+        if(p->start_time == 0) {
+          p->start_time = r_time();
+          p->start_ticks = ticks;
+        }
 
         swtch(&c->context, &p->context);
 

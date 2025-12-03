@@ -23,3 +23,4 @@
 #define SYS_shutdown 22
 #define SYS_countsyscall 23
 #define SYS_getptable 24
+#define SYS_get_proc_time 25

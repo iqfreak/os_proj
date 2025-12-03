@@ -17,6 +17,13 @@ struct pinfo {
     uint64 sz;
 };
 
+struct proc_time {
+    uint64 pid;
+    uint64 start_ticks;
+    uint64 total_ticks;
+    uint64 total_cycles;
+};
+
 // system calls
 int fork(void);
 int exit(int) __attribute__((noreturn));
@@ -42,7 +49,8 @@ int uptime(void);
 int get_keystrokes_count(void);
 int shutdown(void);
 int countsyscall(void);
-int getptable(struct pinfo*);
+int getptable(struct pinfo *);
+int get_proc_time(int pid, struct proc_time *pt);
 
 // ulib.c
 int stat(const char *, struct stat *);

@@ -1,4 +1,5 @@
 #include "kernel/fcntl.h"
+#include "kernel/proc.h"
 #include "kernel/stat.h"
 #include "kernel/types.h"
 #include "user/user.h"
@@ -35,8 +36,11 @@ int main(int argc, char *argv[]) {
     }
 
     for (k = 0; k < nprocess; k++) {
-        pid = wait(0);
-        printf("[pid=%d] terminated\n", pid);
+        struct proc_time pt;
+        if (get_proc_time(pid, &pt) == 0) {
+            printf("PID %d: started at tick %d, ran for %d ticks (%d cycles)\n",
+                   (int)pt.pid, (int)pt.start_ticks, (int)pt.total_ticks, (int)pt.total_cycles);
+        }
     }
 
     exit(0);

@@ -39,3 +39,4 @@ entry("uptime");
 entry("shutdown");
 entry("countsyscall");
 entry("getptable");
+entry("get_proc_time");
