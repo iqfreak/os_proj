@@ -5,29 +5,27 @@
 #include "user/user.h"
 
 int main(int argc, char *argv[]) {
-
     int pid;
-    int k, nprocess = 10;
-    int z, steps = 10000;
+    int k, nprocess = 15;
+    int z, steps = 100000;
     char buffer_src[1024], buffer_dst[1024];
 
     for (k = 0; k < nprocess; k++) {
-        // ensure different creation times (proc->ctime)
-        // needed for properly testing FCFS scheduling
-        sleep(2);
+        // sleep(2);
 
         pid = fork();
         if (pid < 0) {
             printf("%d failed in fork!\n", getpid());
             exit(0);
-
         } else if (pid == 0) {
-            // child
-            printf("[pid=%d] created\n", getpid());
+            // Set priority based on process number
+            // Lower numbers = higher priority
+            int priority = k % 5; // Priorities 0-4
+            set_priority(getpid(), priority);
+
+            // printf("[pid=%d] created with priority %d\n", getpid(), priority);
 
             for (z = 0; z < steps; z += 1) {
-                // copy buffers one inside the other and back
-                // used for wasting cpu time
                 memmove(buffer_dst, buffer_src, 1024);
                 memmove(buffer_src, buffer_dst, 1024);
             }
@@ -37,33 +35,11 @@ int main(int argc, char *argv[]) {
 
     for (k = 0; k < nprocess; k++) {
         struct proc_time pt;
-        if (get_proc_time(pid, &pt) == 0) {
-            printf("PID %d: started at tick %d, ran for %d ticks (%d cycles)\n",
-                   (int)pt.pid, (int)pt.start_ticks, (int)pt.total_ticks, (int)pt.total_cycles);
-        }
+        wait((int*)&pt);  // Pass address, not 0
+        printf("PID %d (priority %d): started at tick %d, ran for %d ticks (%d cycles)\n",
+               (int)pt.pid, (int)pt.priority, (int)pt.start_ticks,
+               (int)pt.total_ticks, (int)pt.total_cycles);
     }
 
     exit(0);
 }
-
-// #include "kernel/types.h"
-// #include "kernel/stat.h"
-// #include "user/user.h"
-
-// int main() {
-//     int pid = fork();
-//     if(pid == 0) {
-//         // Child process - runs to completion
-//         for(int i = 0; i < 100; i++) {
-//             printf("Child: %d\n", i);
-//         }
-//         exit(0);
-//     } else {
-//         // Parent process
-//         for(int i = 0; i < 100; i++) {
-//             printf("Parent: %d\n", i);
-//         }
-//         wait(0);
-//     }
-//     exit(0);
-// }

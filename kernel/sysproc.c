@@ -146,13 +146,6 @@ uint64 sys_getptable(void) {
 
 uint64
 sys_get_proc_time(void) {
-    struct proc_time {
-        uint64 pid;
-        uint64 start_ticks;
-        uint64 total_ticks;
-        uint64 total_cycles;
-    };
-
     int pid;
     uint64 addr;
     extern struct proc proc[NPROC];
@@ -172,6 +165,7 @@ sys_get_proc_time(void) {
             pt.start_ticks = p->start_ticks;
             pt.total_ticks = p->total_ticks;
             pt.total_cycles = r_time() - p->start_time;
+            pt.priority = p->priority;
 
             // Copy to user space
             if (copyout(myproc()->pagetable, addr, (char *)&pt, sizeof(pt)) < 0) {
@@ -179,6 +173,33 @@ sys_get_proc_time(void) {
                 return -1;
             }
 
+            release(&p->lock);
+            return 0;
+        }
+        release(&p->lock);
+    }
+
+    return -1; // Process not found
+}
+
+uint64
+sys_set_priority(void) {
+    int pid, priority;
+    struct proc *p;
+
+    extern struct proc proc[NPROC]; // Add this declaration
+
+    // Use argint for both parameters since they're integers
+    argint(0, &pid);
+    argint(1, &priority);
+
+    if (priority < 0 || priority > 20)
+        return -1;
+
+    for (p = proc; p < &proc[NPROC]; p++) {
+        acquire(&p->lock);
+        if (p->pid == pid && p->state != UNUSED) {
+            p->priority = priority;
             release(&p->lock);
             return 0;
         }

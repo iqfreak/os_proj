@@ -120,4 +120,14 @@ struct proc {
     uint64 start_time;  // When process first runs (in cycles)
     uint64 start_ticks; // When process first runs (in ticks)
     uint64 total_ticks; // Total ticks spent running
+
+    int priority;
+};
+
+struct proc_time {
+    uint64 pid;
+    uint64 start_ticks;
+    uint64 total_ticks;
+    uint64 total_cycles;
+    int priority;
 };

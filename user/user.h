@@ -1,4 +1,5 @@
 #pragma once
+#include "kernel/proc.h"
 
 struct stat;
 
@@ -15,13 +16,6 @@ struct pinfo {
     int state;
     char name[16];
     uint64 sz;
-};
-
-struct proc_time {
-    uint64 pid;
-    uint64 start_ticks;
-    uint64 total_ticks;
-    uint64 total_cycles;
 };
 
 // system calls
@@ -51,6 +45,7 @@ int shutdown(void);
 int countsyscall(void);
 int getptable(struct pinfo *);
 int get_proc_time(int pid, struct proc_time *pt);
+int set_priority(int pid, int priority);
 
 // ulib.c
 int stat(const char *, struct stat *);

@@ -94,6 +94,7 @@ extern uint64 sys_shutdown(void);
 extern uint64 sys_countsyscall(void);
 extern uint64 sys_getptable(void);
 extern uint64 sys_get_proc_time(void);
+extern uint64 sys_set_priority(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -123,6 +124,7 @@ static uint64 (*syscalls[])(void) = {
     [SYS_countsyscall] sys_countsyscall,
     [SYS_getptable] sys_getptable,
     [SYS_get_proc_time] sys_get_proc_time,
+    [SYS_set_priority] sys_set_priority,
 };
 
 void syscall(void) {
