@@ -110,3 +110,8 @@ shutdown:
  li a7, SYS_shutdown
  ecall
  ret
+.global countsyscall
+countsyscall:
+ li a7, SYS_countsyscall
+ ecall
+ ret

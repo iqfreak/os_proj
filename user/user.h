@@ -26,6 +26,7 @@ int sleep(int);
 int uptime(void);
 int get_keystrokes_count(void);
 int shutdown(void);
+int countsyscall(void);
 
 // ulib.c
 int stat(const char *, struct stat *);

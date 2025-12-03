@@ -102,6 +102,7 @@ extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
 extern uint64 sys_shutdown(void);
+extern uint64 sys_countsyscall(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -128,11 +129,19 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_shutdown]   sys_shutdown,
+[SYS_countsyscall]   sys_countsyscall,
 };
 
 void
 syscall(void)
 {
+  // increment syscallCounter
+  extern struct spinlock syscallLock;
+  extern uint64 syscallCount;
+  acquire(&syscallLock);
+  syscallCount++;
+  release(&syscallLock);
+
   int num;
   struct proc *p = myproc();
 

@@ -1,4 +1,5 @@
 #include "defs.h"
+#include "spinlock.h"
 #include "memlayout.h"
 #include "param.h"
 #include "proc.h"
@@ -84,11 +85,20 @@ sys_uptime(void) {
 }
 
 uint64
-sys_shutdown(void)
-{
-  printf("Goodbye world, i will miss living :'(...\n");
-  volatile uint32 *qemu_shutdown = (volatile uint32 *)0x100000;
-  *qemu_shutdown = 0x5555;
-  for(;;);
-  return 0;
+sys_shutdown(void) {
+    volatile uint32 *qemu_shutdown = (volatile uint32 *)0x100000;
+    *qemu_shutdown = 0x5555;
+    return 0;
+}
+
+uint64 sys_countsyscall(void) {
+    extern uint64 syscallCount;
+    extern struct spinlock syscallLock;
+
+    int count;
+    acquire(&syscallLock);
+    count = syscallCount;
+    release(&syscallLock);
+
+    return count;
 }

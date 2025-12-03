@@ -150,6 +150,7 @@ UPROGS=\
 	$U/_find\
 	$U/_wce\
 	$U/_shutdown\
+	$U/_countsyscall\
 
 
 
