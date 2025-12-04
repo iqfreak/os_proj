@@ -208,3 +208,13 @@ sys_set_priority(void) {
 
     return -1; // Process not found
 }
+
+uint64
+sys_getppid(void) {
+  struct proc *p = myproc();
+
+  if (p->parent)
+    return p->parent->pid;
+  else
+    return 0;   // init process or no parent
+}

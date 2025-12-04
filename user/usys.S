@@ -130,3 +130,8 @@ set_priority:
  li a7, SYS_set_priority
  ecall
  ret
+.global getppid
+getppid:
+ li a7, SYS_getppid
+ ecall
+ ret

@@ -1,5 +1,3 @@
-#ifndef __ASSEMBLER__
-
 #pragma once
 
 typedef unsigned int uint;
@@ -12,4 +10,3 @@ typedef unsigned int uint32;
 typedef unsigned long uint64;
 
 typedef uint64 pde_t;
-#endif /* __ASSEMBLER__ */
