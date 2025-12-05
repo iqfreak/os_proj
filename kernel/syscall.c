@@ -68,6 +68,19 @@ int argstr(int n, char *buf, int max) {
     return fetchstr(addr, buf, max);
 }
 
+int argptr(int n, char **pp, int size)
+{
+    uint64 addr;
+    struct proc *p = myproc();
+
+    addr = argraw(n);
+    if(size < 0 || addr >= p->sz || addr+size > p->sz)
+        return -1;
+    *pp = (char*)addr;
+    return 0;
+}
+
+
 // Prototypes for the functions that handle system calls.
 extern uint64 sys_fork(void);
 extern uint64 sys_exit(void);
@@ -127,7 +140,7 @@ static uint64 (*syscalls[])(void) = {
     [SYS_getptable] sys_getptable,
     [SYS_get_proc_time] sys_get_proc_time,
     [SYS_set_priority] sys_set_priority,
-    [SYS_getppid] sys_getppid
+    [SYS_getppid] sys_getppid,
     [SYS_datetime] sys_datetime
 };
 
@@ -135,6 +148,7 @@ void syscall(void) {
     // increment syscallCounter
     extern struct spinlock syscallLock;
     extern uint64 syscallCount;
+    extern uint64 sys_datetime(void);
     acquire(&syscallLock);
     syscallCount++;
     release(&syscallLock);

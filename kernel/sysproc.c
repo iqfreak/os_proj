@@ -102,6 +102,14 @@ uint64 sys_countsyscall(void) {
     return count;
 }
 
+
+uint64
+sys_datetime(void)
+{
+    return ticks; // or your desired value
+}
+
+
 uint64 sys_getptable(void) {
     struct pinfo {
         int pid;

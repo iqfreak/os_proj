@@ -4,15 +4,7 @@
 #include "param.h"
 #include "memlayout.h"
 #include "proc.h"
-
-struct rtcdate {
-    int year;
-    int month;
-    int day;
-    int hour;
-    int minute;
-    int second;
-};
+#include "spinlock.h"
 
 #define CLINT_MTIME 0x0200bff8L   // memory-mapped mtime register
 #define TIMER_FREQ 10000000       // 10 MHz

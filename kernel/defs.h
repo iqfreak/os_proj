@@ -15,6 +15,10 @@ struct sleeplock;
 struct stat;
 struct superblock;
 
+
+int argptr(int n, char **pp, int size);
+
+
 // bio.c
 void binit(void);
 struct buf *bread(uint, uint);
