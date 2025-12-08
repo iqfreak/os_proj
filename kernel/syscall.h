@@ -28,3 +28,4 @@
 #define SYS_getppid 27
 
 #define SYS_randd   28
+#define SYS_datetime 29
