@@ -47,6 +47,7 @@ int getptable(struct pinfo *);
 int get_proc_time(int pid, struct proc_time *pt);
 int set_priority(int pid, int priority);
 int getppid(void);
+int randd(void);
 
 // ulib.c
 int stat(const char *, struct stat *);

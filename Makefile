@@ -154,6 +154,9 @@ UPROGS=\
 	$U/_ps\
 	$U/_schedtest\
 	$U/_getppid\
+	$U/_randtest\
+	$U/_uptime\
+
 
 fs.img: mkfs/mkfs README $(UPROGS) user/file1.txt user/file2.txt
 	mkfs/mkfs fs.img README $(UPROGS) user/file1.txt user/file2.txt

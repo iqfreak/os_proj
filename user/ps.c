@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
     struct pinfo ptable[NPROC];
     int nproc = getptable(ptable);
-
+    
     printf("PID   PPID   State     Name   Size\n");
     for (int i = 0; i < nproc; ++i) {
         printf("%d      %d     %s    %s     %d\n",

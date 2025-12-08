@@ -42,3 +42,5 @@ entry("getptable");
 entry("get_proc_time");
 entry("set_priority");
 entry("getppid");
+entry("randd");
+

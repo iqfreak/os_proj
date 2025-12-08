@@ -71,8 +71,7 @@ sys_kill(void) {
     return kill(pid);
 }
 
-// return how many clock tick interrupts have occurred
-// since start.
+
 uint64
 sys_uptime(void) {
     uint xticks;
@@ -217,4 +216,19 @@ sys_getppid(void) {
     return p->parent->pid;
   else
     return 0;   // init process or no parent
+}
+// kernel/sysproc.c or similar
+static uint64 rand_seed = 1;
+
+
+uint64
+sys_randd(void)
+{
+  struct proc *p = myproc();
+
+  // Mix in the pid to avoid identical sequences from multiple processes
+  rand_seed ^= (p->pid * 0x9e3779b97f4a7c15ULL);
+
+  rand_seed = rand_seed * 1103515245 + 12345;
+  return (rand_seed >> 16) & 0x7FFF;
 }
