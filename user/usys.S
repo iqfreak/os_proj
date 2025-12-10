@@ -140,3 +140,13 @@ datetime:
  li a7, SYS_datetime
  ecall
  ret
+.global randd
+randd:
+ li a7, SYS_randd
+ ecall
+ ret
+.global kbdint
+kbdint:
+ li a7, SYS_kbdint
+ ecall
+ ret
