@@ -40,7 +40,6 @@ int getpid(void);
 char *sbrk(int);
 int sleep(int);
 int uptime(void);
-int get_keystrokes_count(void);
 int shutdown(void);
 int countsyscall(void);
 int getptable(struct pinfo *);
@@ -49,7 +48,7 @@ int set_priority(int pid, int priority);
 int getppid(void);
 int datetime(void);
 int randd(void);
-
+int kbdint(void);
 
 
 // ulib.c

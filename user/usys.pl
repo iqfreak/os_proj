@@ -44,4 +44,4 @@ entry("set_priority");
 entry("getppid");
 entry("datetime");
 entry("randd");
-
+entry("kbdint");

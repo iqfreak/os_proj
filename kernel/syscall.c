@@ -98,6 +98,7 @@ extern uint64 sys_set_priority(void);
 extern uint64 sys_getppid(void);
 extern uint64 sys_datetime(void);
 extern uint64 sys_randd(void);
+extern uint64 sys_kbdint(void);
 
 // extern uint64 sys_datetime(void);
 
@@ -132,7 +133,8 @@ static uint64 (*syscalls[])(void) = {
     [SYS_set_priority] sys_set_priority,
     [SYS_getppid] sys_getppid,
     [SYS_datetime] sys_datetime,
-    [SYS_randd] sys_randd    // [SYS_datetime] sys_datetime
+    [SYS_randd] sys_randd,
+    [SYS_kbdint] sys_kbdint   // [SYS_datetime] sys_datetime
 };
 
 void syscall(void) {
