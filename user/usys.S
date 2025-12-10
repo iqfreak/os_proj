@@ -135,8 +135,14 @@ getppid:
  li a7, SYS_getppid
  ecall
  ret
+<<<<<<< HEAD
 .global datetime
 datetime:
  li a7, SYS_datetime
+=======
+.global randd
+randd:
+ li a7, SYS_randd
+>>>>>>> backupgang
  ecall
  ret

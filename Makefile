@@ -157,8 +157,8 @@ UPROGS=\
 	$U/_shutdown\
 	$U/_countsyscall\
 	$U/_ps\
+	$U/_randdtest\
 	$U/_schedtest\
-
 
 fs.img: mkfs/mkfs README $(UPROGS) user/file1.txt user/file2.txt
 	mkfs/mkfs fs.img README $(UPROGS) user/file1.txt user/file2.txt
