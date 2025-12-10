@@ -25,6 +25,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    if (nlines < 0) {
+        printf("tail: nlines can't be negative \n");
+        return -1;
+    }
+
     char *path = flagIdx == 1 ? argv[3] : argv[1];
 
     int fd = open(path, O_RDONLY);
@@ -32,9 +37,23 @@ int main(int argc, char *argv[]) {
         printf("tail: cannot open %s\n", argv[1]);
         return -1;
     }
-    // lseek
 
+    char buf[600];
+    int nread = read(fd, buf, sizeof(buf));
+    int lines = 0;
 
+    int i;
+    for (i = nread - 1; i >= 0; --i) {
+        if (buf[i] == '\n')
+            ++lines;
+
+        if (lines > nlines) {
+            ++i;
+            break;
+        }
+    }
+
+    write(1, buf + i, nread - i);
     close(fd);
 
     return 0;

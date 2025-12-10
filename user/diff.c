@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (argc != 3) {
-        fprintf(2, "diff: Incorrect usage \n");
+        fprintf(2, "diff: Incorrect usage, diff <file1> <file2> \n");
         exit(1);
     }
 
