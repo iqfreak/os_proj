@@ -179,7 +179,7 @@ sys_get_proc_time(void) {
         release(&p->lock);
     }
 
-    return -1; // Process not found
+    return -1;
 }
 
 uint64
@@ -187,9 +187,8 @@ sys_set_priority(void) {
     int pid, priority;
     struct proc *p;
 
-    extern struct proc proc[NPROC]; // Add this declaration
+    extern struct proc proc[NPROC];
 
-    // Use argint for both parameters since they're integers
     argint(0, &pid);
     argint(1, &priority);
 
@@ -221,5 +220,14 @@ sys_getppid(void) {
 
 uint64
 sys_datetime(void) {
-    return 3894;
+    uint64 addr;
+    argaddr(0, &addr);
+
+    struct rtcdate datetime;
+    get_datetime(&datetime);
+
+    if (copyout(myproc()->pagetable, addr, (char *)&datetime, sizeof(datetime)) < 0)
+        return -1;
+
+    return 0;
 }

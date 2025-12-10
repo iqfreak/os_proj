@@ -4,6 +4,6 @@
 #include "user/user.h"
 
 int main(int argc, char *argv[]) {
-  printf("yo the great datetime was called\n");
+  printf("yo the great datetime was called, %d\n", datetime());
   return 0;
 }
