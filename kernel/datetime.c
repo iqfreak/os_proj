@@ -6,12 +6,13 @@
 #include "types.h"
 
 // Constants for hardware timer
-#define CLINT_MTIME 0x0200bff8L // memory-mapped mtime register
-#define TIMER_FREQ 10000000     // 10 MHz
+#define CLINT_BASE 0x0200c000L
+#define CLINT_MTIME 0x0200bff8L
+#define TIMER_FREQ 10000000 // 10 MHz
 
 void get_datetime(struct rtcdate *d) {
     volatile uint64 *mtime = (uint64 *)CLINT_MTIME;
-    uint64 secs = *mtime / TIMER_FREQ + BOOT_EPOCH; // type: ignore
+    uint64 secs = *mtime / TIMER_FREQ + BOOT_EPOCH;
     d->second = secs % 60;
     d->minute = secs / 60 % 60;
     d->hour = secs / 60 / 60 % 24;

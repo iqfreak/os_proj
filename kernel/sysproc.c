@@ -229,5 +229,7 @@ sys_datetime(void) {
     if (copyout(myproc()->pagetable, addr, (char *)&datetime, sizeof(datetime)) < 0)
         return -1;
 
+    printf("succeeded");
+
     return 0;
 }

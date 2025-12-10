@@ -45,6 +45,10 @@ kvmmake(void) {
     // QEMU test device for shutdown
     kvmmap(kpgtbl, 0x100000, 0x100000, PGSIZE, PTE_R | PTE_W);
 
+    // mtime address
+    uint64 clint_mtime_page = 0x0200bff8L & ~0xfff;
+    kvmmap(kpgtbl, clint_mtime_page, clint_mtime_page, PGSIZE, PTE_R | PTE_W);
+
     // allocate and map a kernel stack for each process.
     proc_mapstacks(kpgtbl);
 
