@@ -135,3 +135,8 @@ getppid:
  li a7, SYS_getppid
  ecall
  ret
+.global randd
+randd:
+ li a7, SYS_randd
+ ecall
+ ret

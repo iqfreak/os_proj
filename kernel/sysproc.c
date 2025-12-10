@@ -218,3 +218,18 @@ sys_getppid(void) {
 
     return ppid;
 }
+
+static uint64 rand_seed = 1;
+
+
+uint64
+sys_randd(void)
+{
+  struct proc *p = myproc();
+
+  // Mix in the pid to avoid identical sequences from multiple processes
+  rand_seed ^= (p->pid * 0x9e3779b97f4a7c15ULL);
+
+  rand_seed = rand_seed * 1103515245 + 12345;
+  return (rand_seed >> 16) & 0x7FFF;
+}
