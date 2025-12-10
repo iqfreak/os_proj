@@ -4,6 +4,8 @@ touch DONE
 add DONE
 fact DONE
 tail DONE
+diff DONE
+Maze the ultimate debugger!
 
 
 
