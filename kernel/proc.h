@@ -131,3 +131,5 @@ struct proc_time {
     uint64 total_cycles;
     int priority;
 };
+
+int proc_parent_pid(struct proc *p);

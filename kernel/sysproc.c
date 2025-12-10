@@ -129,7 +129,7 @@ uint64 sys_getptable(void) {
         }
 
         ptable[count].pid = p->pid;
-        ptable[count].ppid = p->parent ? p->parent->pid : 0;
+        ptable[count].ppid = proc_parent_pid(p);
         ptable[count].state = p->state;
         safestrcpy(ptable[count].name, p->name, sizeof(ptable[count].name));
         ptable[count].sz = p->sz;
@@ -211,12 +211,10 @@ sys_set_priority(void) {
 
 uint64
 sys_getppid(void) {
-  struct proc *p = myproc();
+    struct proc *p = myproc();
+    acquire(&p->lock);
+    int ppid = proc_parent_pid(p);
+    release(&p->lock);
 
-  if (p->parent)
-    return p->parent->pid;
-  else
-    return 0;   // init process or no parent
+    return ppid;
 }
-
-

@@ -703,3 +703,7 @@ void procdump(void) {
         printf("\n");
     }
 }
+
+int proc_parent_pid(struct proc *p) {
+    return p->parent ? p->parent->pid : 0;
+}
