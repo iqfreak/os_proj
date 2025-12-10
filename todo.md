@@ -5,7 +5,15 @@ add DONE
 fact DONE
 tail DONE
 diff DONE
-Maze the ultimate debugger!
+
+
+== Syscalls ==
+kbdint?
+countsyscall DONE
+getppid DONE
+getptable DONE
+
+
 
 ping pong
 ?mv, cp error handling

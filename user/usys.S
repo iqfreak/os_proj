@@ -135,3 +135,8 @@ getppid:
  li a7, SYS_getppid
  ecall
  ret
+.global datetime
+datetime:
+ li a7, SYS_datetime
+ ecall
+ ret

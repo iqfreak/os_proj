@@ -218,3 +218,8 @@ sys_getppid(void) {
 
     return ppid;
 }
+
+uint64
+sys_datetime(void) {
+    return 3894;
+}
