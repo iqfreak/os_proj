@@ -11,6 +11,7 @@ int main(int argc, char *argv[]) {
     }
 
     int nlines = 10;
+    (void)nlines;  // To avoid unused variable warning
     int flagIdx = -1;
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-n") == 0) {

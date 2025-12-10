@@ -96,6 +96,7 @@ extern uint64 sys_getptable(void);
 extern uint64 sys_get_proc_time(void);
 extern uint64 sys_set_priority(void);
 extern uint64 sys_getppid(void);
+extern uint64 sys_kbdint(void);
 // extern uint64 sys_datetime(void);
 
 // An array mapping syscall numbers from syscall.h
@@ -128,6 +129,7 @@ static uint64 (*syscalls[])(void) = {
     [SYS_get_proc_time] sys_get_proc_time,
     [SYS_set_priority] sys_set_priority,
     [SYS_getppid] sys_getppid,
+    [SYS_kbdint] sys_kbdint
     // [SYS_datetime] sys_datetime
 };
 

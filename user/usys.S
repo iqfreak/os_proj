@@ -135,3 +135,8 @@ getppid:
  li a7, SYS_getppid
  ecall
  ret
+.global kbdint
+kbdint:
+ li a7, SYS_kbdint
+ ecall
+ ret

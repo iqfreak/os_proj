@@ -220,3 +220,9 @@ sys_getppid(void) {
 }
 
 
+extern int kbd_int_count;
+uint64
+sys_kbdint(void)
+{
+  return kbd_int_count;
+}
