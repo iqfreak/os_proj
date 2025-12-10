@@ -1,3 +1,4 @@
+#include "kernel/fcntl.h"
 #include "kernel/fs.h"
 #include "kernel/stat.h"
 #include "kernel/types.h"
@@ -5,38 +6,36 @@
 
 int main(int argc, char *argv[]) {
     if (argc == 2 && argv[1][0] == '?' && argv[1][1] == '\0') {
-        printf("Usage: tail file1 file2 ?-n <nlines>\n");
+        printf("Usage: tail file1 ?-n <nlines>\n");
         return 0;
     }
 
-    // Flags Parsing
-    struct opt options[] = {
-        {.opt = 'n', .has_arg = 1},
-    };
-    int nopts = sizeof(options) / sizeof(options[0]);
-
-    parse_flags(argc, argv, options, nopts);
-
     int nlines = 10;
-    if (options[0].seen) {
-        int val = parse_nonneg_int(options[0].arg);
-        if (val <= 0) {
-            printf("Bad usage, n liens can't be a zero or less");
-            return -1;
+    int flagIdx = -1;
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-n") == 0) {
+            char *targetInt = argv[i + 1];
+            if (!is_valid_int(targetInt)) {
+                printf("tail: %s is not a valid integer\n", argv[i + 1]);
+                return -1;
+            }
+
+            flagIdx = i;
+            nlines = atoi(targetInt);
         }
-
-        nlines = val;
-    }
-    // End Flags Parsing
-
-    strip_flags(argc, argv, "n");
-
-    if (argc != 2) {
-        printf("Incorrect usage, tail file ?-n <nlines>");
     }
 
-    printf("\n--%s, nlines: %d\n", argv[1], nlines); // this should be the file path
+    char *path = flagIdx == 1 ? argv[3] : argv[1];
 
-    printf("lol\n");
+    int fd = open(path, O_RDONLY);
+    if (fd < 0) {
+        printf("tail: cannot open %s\n", argv[1]);
+        return -1;
+    }
+    // lseek
+
+
+    close(fd);
+
     return 0;
 }
