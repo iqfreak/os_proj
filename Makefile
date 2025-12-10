@@ -141,6 +141,7 @@ UPROGS=\
 	$U/_zombie\
 	$U/_sleep\
 	$U/_mv\
+	$U/_uptimetest\
 	$U/_tail\
 	$U/_cp\
 	$U/_touch\
@@ -154,6 +155,7 @@ UPROGS=\
 	$U/_ps\
 	$U/_schedtest\
 	$U/_xo\
+
 
 fs.img: mkfs/mkfs README $(UPROGS) user/file1.txt user/file2.txt
 	mkfs/mkfs fs.img README $(UPROGS) user/file1.txt user/file2.txt
