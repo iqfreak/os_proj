@@ -49,7 +49,6 @@ int set_priority(int pid, int priority);
 int getppid(void);
 int datetime(struct rtcdate *d);
 
-
 // ulib.c
 int stat(const char *, struct stat *);
 char *strcpy(char *, const char *);
@@ -68,6 +67,7 @@ void *memcpy(void *, const void *, uint);
 
 char *strcat(char *, const char *);
 int isdir(char *);
+int is_valid_int(char *);
 char *joinpath(char *, char *, char *, int);
 char *getFilename(char *path);
 

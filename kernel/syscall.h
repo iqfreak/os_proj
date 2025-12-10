@@ -26,4 +26,4 @@
 #define SYS_get_proc_time 25
 #define SYS_set_priority 26
 #define SYS_getppid 27
-#define SYS_datetime 28
+// #define SYS_datetime 28

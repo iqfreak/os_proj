@@ -11,12 +11,22 @@ int main(int argc, char *argv[]) {
 
     if (argc != 3) {
         fprintf(2, "incorrect usage");
-        exit(1);
+        return -1;
+    }
+
+    if (!is_valid_int(argv[1])) {
+        fprintf(2, "add: '%s' is not a valid integer\n", argv[1]);
+        return -1;
+    }
+
+    if (!is_valid_int(argv[2])) {
+        fprintf(2, "add: '%s' is not a valid integer\n", argv[2]);
+        return -1;
     }
 
     int a = atoi(argv[1]);
     int b = atoi(argv[2]);
     printf("%d\n", a + b);
 
-    exit(0);
+    return 0;
 }

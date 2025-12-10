@@ -174,6 +174,16 @@ int isdir(char *path) {
     return st.type == T_DIR;
 }
 
+int is_valid_int(char *s) {
+    int i = 0;
+    if (s[0] == '-' || s[0] == '+') i++;
+    for (; s[i]; i++) {
+        if (s[i] < '0' || s[i] > '9')
+            return 0;
+    }
+    return 1;
+}
+
 char *joinpath(char *dir, char *filename, char *out_buffer, int bufsize) {
     int dn = strlen(dir);
     int nn = strlen(filename);

@@ -4,7 +4,7 @@
         "**/*.o": true,
         "**/*.asm": true,
         "**/*.sym": true,
-        "**/*.S": true,
+        // "**/*.S": true,
         "**/_*": true
     },
     "editor.tabSize": 2,
