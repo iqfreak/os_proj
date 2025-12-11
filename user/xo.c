@@ -130,7 +130,7 @@ int evaluate_board() {
 }
 
 // AI is MAX, always O
-int minimax(int depth, int isMax, int *bestMove) {
+int minimax(int depth, int isMax, int alpha, int beta, int *bestMove) {
     int score = evaluate_board();
 
     if (score == 10)
@@ -142,8 +142,9 @@ int minimax(int depth, int isMax, int *bestMove) {
 
     int localBestMove = -1;
     int best;
+
     if (isMax) {
-        best = -1000;
+        best = -10000;
         for (int i = 0; i < B; i++) {
             for (int j = 0; j < B; j++) {
                 if (board[i][j] != 'X' && board[i][j] != 'O') {
@@ -151,7 +152,7 @@ int minimax(int depth, int isMax, int *bestMove) {
                     char backup = board[i][j];
                     board[i][j] = 'O';
 
-                    int val = minimax(depth + 1, 0, bestMove);
+                    int val = minimax(depth + 1, 0, alpha, beta, bestMove);
 
                     board[i][j] = backup;
 
@@ -159,11 +160,21 @@ int minimax(int depth, int isMax, int *bestMove) {
                         localBestMove = (i * 3 + 1 + j);
                         best = val;
                     }
+
+                    if (best > alpha) {
+                        alpha = best;
+                    }
+                    if (beta <= alpha) {
+                        break;
+                    }
                 }
             }
+
+            if (beta <= alpha)
+                break;
         }
     } else {
-        best = 1000;
+        best = 10000;
         for (int i = 0; i < B; i++) {
             for (int j = 0; j < B; j++) {
                 if (board[i][j] != 'X' && board[i][j] != 'O') {
@@ -171,7 +182,7 @@ int minimax(int depth, int isMax, int *bestMove) {
                     char backup = board[i][j];
                     board[i][j] = 'X';
 
-                    int val = minimax(depth + 1, 1, bestMove);
+                    int val = minimax(depth + 1, 1, alpha, beta, bestMove);
 
                     board[i][j] = backup;
 
@@ -179,8 +190,18 @@ int minimax(int depth, int isMax, int *bestMove) {
                         localBestMove = (i * 3 + 1 + j);
                         best = val;
                     }
+
+                    if (best < beta) {
+                        beta = best;
+                    }
+                    if (beta <= alpha) {
+                        break;
+                    }
                 }
             }
+
+            if (beta <= alpha)
+                break;
         }
     }
 
@@ -189,7 +210,6 @@ int minimax(int depth, int isMax, int *bestMove) {
 
     return best;
 }
-
 int main(int argc, char *argv[]) {
     if (argc >= 2 && argv[1][0] == '?') {
         printf("xo, optional -ai for ai mode\n");
@@ -220,7 +240,7 @@ int main(int argc, char *argv[]) {
 
         int pos;
         if (ai_mode && cur == 'O') {
-            minimax(0, 1, &pos);
+            minimax(0, 1, -1000000, 1000000, &pos);
         } else {
             prompt_player();
 
