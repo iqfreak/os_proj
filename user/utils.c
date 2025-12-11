@@ -7,16 +7,46 @@
 #define MAX_PATH_LEN 700
 #define verbose 1
 
+static void
+normalize_path(const char *in, char *out)
+{
+    // strip repeated leading "./"
+    while (in[0] == '.' && in[1] == '/')
+        in += 2;
+
+    // copy
+    int i = 0;
+    while (*in && i + 1 < MAX_PATH_LEN) {
+        out[i++] = *in++;
+    }
+    if (i == 0) {
+        // empty -> "."
+        out[0] = '.';
+        out[1] = 0;
+        return;
+    }
+    // strip trailing slashes (but keep leading "/" if it's root)
+    while (i > 1 && out[i-1] == '/')
+        i--;
+    out[i] = 0;
+}
+
 int move(char *src, char *dst, int shouldDelete) {
+    // Normalize paths before comparing to detect dst inside src reliably
+    char norm_src[MAX_PATH_LEN];
+    char norm_dst[MAX_PATH_LEN];
+    normalize_path(src, norm_src);
+    normalize_path(dst, norm_dst);
+
     if (!isdir(dst)) {
         printf("mv: dst must be a directory");
         return -1;
     }
 
     // If dst == src or dst starts with "src/" then refuse.
-    int src_len = strlen(src);
-    if (strcmp(dst, src) == 0 ||
-        (strlen(dst) > src_len && strncmp(dst, src, src_len) == 0 && dst[src_len] == '/')) {
+    int src_len = strlen(norm_src);
+    if (strcmp(norm_dst, norm_src) == 0 ||
+        (strlen(norm_dst) > src_len && strncmp(norm_dst, norm_src, src_len) == 0 && norm_dst[src_len] == '/')) {
         fprintf(2, "mv: destination is inside source\n");
         return -1;
     }
