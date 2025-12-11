@@ -1,6 +1,7 @@
+// todo handle ctrl-c click to exit
+#include "user/user.h"
 #include "kernel/stat.h"
 #include "kernel/types.h"
-#include "user/user.h"
 
 #define B 3
 
@@ -215,17 +216,16 @@ int main(int argc, char *argv[]) {
         printf("xo, optional -ai for ai mode\n");
         return 0;
     }
-
     init_board();
+
     int ai_mode = 0;
     for (int i = 1; i < argc; ++i)
         if (strcmp(argv[i], "-ai") == 0) {
-            printf("\nGet Ready To Lose Bud >:P\n");
+            printf("\nGood luck bro, you need it :p\n");
             ai_mode = 1;
             break;
         }
 
-    char buf[16];
     int random_starter = randd() % 2;
     if (random_starter == 0) {
         xo_curr = 'X';
@@ -235,6 +235,7 @@ int main(int argc, char *argv[]) {
         printf("\nPlayer O starts.\n");
     }
 
+    char buf[16];
     while (1) {
         draw_board();
 
@@ -273,7 +274,7 @@ int main(int argc, char *argv[]) {
         xo_curr = (xo_curr == 'X') ? 'O' : 'X';
     }
     if (ai_mode)
-        printf("told ya you can't win >:P\n");
+        printf("perhaps if you tried harde- nah it won't matter\n");
 
     out("Game over.\n", 11);
     exit(0);

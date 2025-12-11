@@ -153,7 +153,6 @@ UPROGS=\
 	$U/_diff\
 	$U/_find\
 	$U/_wce\
-	$U/_xo\
 	$U/_datetime\
 	$U/_shutdown\
 	$U/_countsyscall\
@@ -161,6 +160,8 @@ UPROGS=\
 	$U/_randdtest\
 	$U/_schedtest\
 	$U/_kbdint\
+	$U/_xo\
+	$U/_c4\
 
 
 fs.img: mkfs/mkfs README $(UPROGS) user/file1.txt user/file2.txt
