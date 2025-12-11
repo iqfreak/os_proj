@@ -118,10 +118,9 @@ struct proc {
     char name[16];               // Process name (debugging)
 
     uint64 start_time;  // When process first runs (in cycles)
-    uint64 start_ticks; // When process first runs (in ticks)
+    uint64 fixed_start_time;
     uint64 turnaround_time; // Total ticks spent running
     uint64 wait_time;  // Total ticks since it was ready
-    uint64 total_wait_time;  // Total ticks since it was ready
     uint64 end_time;  // Total ticks since it was ready
 
     int priority;
@@ -129,9 +128,11 @@ struct proc {
 
 struct proc_time {
     uint64 pid;
-    uint64 start_ticks;
+    uint64 start_time;
+    uint64 fixed_start_time;
     uint64 turnaround_time;
-    uint64 total_cycles;
+    uint64 wait_time;
+    uint64 end_time;
     int priority;
 };
 

@@ -261,6 +261,13 @@ int growproc(int n) {
 // Create a new process, copying the parent.
 // Sets up child kernel stack to return as if from fork() system call.
 int fork(void) {
+    // acquire(&tickslock);
+    // uint64 start = ticks;
+    // while (ticks - start < 10) {
+    //     sleep(&ticks, &tickslock);
+    // }
+    // release(&tickslock);
+
     int i, pid;
     struct proc *np;
     struct proc *p = myproc();
@@ -303,7 +310,11 @@ int fork(void) {
     acquire(&np->lock);
     np->state = RUNNABLE;
     np->start_time = r_time();
-    np->wait_time = ticks; // child ready now
+    //
+    np->fixed_start_time = r_time();
+    np->wait_time = r_time();
+    //
+    printf("\nFROM FORK: %lu\n", np->start_time);
     release(&np->lock);
 
     return pid;
@@ -334,7 +345,7 @@ void exit(int status) {
     // Calculate exectuion time
     if (p->start_time != 0) {
         p->turnaround_time = r_time() - p->start_time;
-        p->end_time = ticks;
+        p->end_time = r_time();
     }
 
     // Close all open files.
@@ -390,22 +401,24 @@ int wait(uint64 addr) {
                 if (pp->state == ZOMBIE) {
                     pid = pp->pid;
 
-                    // Create timing struct to return to user
                     struct proc_time pt;
-                    pt.pid = pp->pid;
-                    pt.start_ticks = pp->start_ticks;
-                    pt.turnaround_time = pp->turnaround_time;
-                    pt.total_cycles = r_time() - pp->start_time;
-                    pt.priority = pp->priority;
+                    memset(&pt, 0, sizeof(pt));
 
-                    // Copy timing struct instead of just exit status
+                    // Create timing struct to return to user
+                    pt.pid = pp->pid;
+                    pt.priority = pp->priority;
+                    pt.fixed_start_time = pp->fixed_start_time;
+                    pt.turnaround_time = pp->turnaround_time;
+                    pt.wait_time = pp->wait_time;
+                    pt.end_time = pp->end_time;
+
+                    // Copy timing struct to user space
                     if (addr != 0 && copyout(p->pagetable, addr, (char *)&pt,
                                              sizeof(pt)) < 0) {
                         release(&pp->lock);
                         release(&wait_lock);
                         return -1;
                     }
-
                     freeproc(pp);
                     release(&pp->lock);
                     release(&wait_lock);
@@ -501,16 +514,14 @@ void scheduler(void) {
             // target_p's lock is already held
             target_p->state = RUNNING;
 
-            uint64 wait_time = r_time() - target_p->wait_time;
-            target_p->total_wait_time += wait_time;
+            target_p->wait_time = r_time() - target_p->start_time;
 
             c->proc = target_p;
 
-            // Record timing if first time running
-            if (target_p->start_time == 0) {
-                target_p->start_time = r_time();
-                target_p->start_ticks = ticks;
-            }
+            // // Record timing if first time running
+            // if (target_p->start_time == 0) {
+            //     target_p->start_time = r_time();
+            // }
 
             swtch(&c->context, &target_p->context);
 

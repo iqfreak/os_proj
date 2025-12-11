@@ -162,10 +162,11 @@ sys_get_proc_time(void) {
         if (p->pid == pid && p->state != UNUSED) {
             // Fill the struct
             pt.pid = p->pid;
-            pt.start_ticks = p->start_ticks;
+            // pt.start_time = p->start_time;
+            pt.fixed_start_time = p->fixed_start_time;
             pt.turnaround_time = p->turnaround_time;
-            pt.total_cycles = r_time() - p->start_time;
             pt.priority = p->priority;
+            pt.wait_time = p->wait_time;
 
             // Copy to user space
             if (copyout(myproc()->pagetable, addr, (char *)&pt, sizeof(pt)) < 0) {
