@@ -5,11 +5,14 @@
 int read_line(int fd, char *buf) {
     int n = 0;
     char c;
-    while (read(fd, &c, 1) == 1) {
+    int r;
+    while ((r = read(fd, &c, 1)) == 1) {
         if (c == '\n')
             break;
         buf[n++] = c;
     }
+    if (r == 0 && n == 0)
+        return -1; // EOF and no chars read
     buf[n] = 0;
     return n;
 }
@@ -43,17 +46,19 @@ int main(int argc, char *argv[]) {
         int n1 = read_line(fd1, buf1);
         int n2 = read_line(fd2, buf2);
 
-        if (n1 == 0 && n2 == 0)
+        if (n1 == -1 && n2 == -1)
             break;
 
-        if (n1 == 0) {
+        if (n1 == -1) {
+            // remaining lines in file2
             printf("Line %d only in %s:\n> %s\n", line_num, file2, buf2);
             line_num++;
             differences++;
             continue;
         }
 
-        if (n2 == 0) {
+        if (n2 == -1) {
+            // remaining lines in file1
             printf("Line %d only in %s:\n< %s\n", line_num, file1, buf1);
             line_num++;
             differences++;
