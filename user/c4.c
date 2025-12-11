@@ -223,8 +223,6 @@ int get_ai_move() {
 }
 
 int main(int argc, char *argv[]) {
-    init_board();
-
     if (argc >= 2 && argv[1][0] == '?') {
         printf("c4, optional -ai for ai mode\n");
         return 0;
@@ -239,52 +237,66 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-    int random_starter = randd() % 2;
-    if (random_starter == 0) {
-        c4_cur = 'X';
-        printf("\nPlayer X starts.\n");
-    } else {
-        c4_cur = 'O'; // AI (or Player 2)
-        printf("\nPlayer O starts.\n");
-    }
-
-    char buf[16];
-    int col, row;
-    while (1) {
-        print_board();
-
-        if (ai_mode && c4_cur == 'O') {
-            col = get_ai_move();
+    int playing = 1;
+    while (playing) {
+        init_board();
+        int random_starter = randd() % 2;
+        if (random_starter == 0) {
+            c4_cur = 'X';
+            printf("\nPlayer X starts.\n");
         } else {
-            // printf with %c is unreliable in this environment; write the char directly
-            printf("Player ");
-            write(1, &c4_cur, 1);
-            printf(" (1-7): ");
-            int n = read(0, buf, sizeof(buf) - 1);
-            if (n <= 0)
-                continue;
-            buf[n] = 0;
-
-            col = atoi(buf) - 1;
+            c4_cur = 'O'; // AI (or Player 2)
+            printf("\nPlayer O starts.\n");
         }
 
-        row = get_next_open_row(col);
-        if (row == -1 || col < 0 || col >= COLS) {
-            printf("Invalid move!\n");
-            continue;
-        }
-
-        make_move(row, col, c4_cur);
-
-        if (check_win(c4_cur)) {
+        char buf[16];
+        int col, row;
+        while (1) {
             print_board();
-            printf("Player ");
-            write(1, &c4_cur, 1);
-            printf(" Wins!\n");
-            break;
-        }
 
-        c4_cur = (c4_cur == 'X') ? 'O' : 'X';
+            if (ai_mode && c4_cur == 'O') {
+                col = get_ai_move();
+            } else {
+                // printf with %c is unreliable in this environment; write the char directly
+                printf("Player ");
+                write(1, &c4_cur, 1);
+                printf(" (1-7): ");
+                int n = read(0, buf, sizeof(buf) - 1);
+                if (n <= 0)
+                    continue;
+                buf[n] = 0;
+
+                // Detect Ctrl-C
+                if (buf[n - 1] == '\n')
+                    buf[n - 1] = 0;
+
+                if (strcmp(buf, "exit") == 0) {
+                    printf("bye...\n");
+                    playing = 0;
+                    break;
+                }
+
+                col = atoi(buf) - 1;
+            }
+
+            row = get_next_open_row(col);
+            if (row == -1 || col < 0 || col >= COLS) {
+                printf("Invalid move!\n");
+                continue;
+            }
+
+            make_move(row, col, c4_cur);
+
+            if (check_win(c4_cur)) {
+                print_board();
+                printf("Player ");
+                write(1, &c4_cur, 1);
+                printf(" Wins!\n");
+                break;
+            }
+
+            c4_cur = (c4_cur == 'X') ? 'O' : 'X';
+        }
     }
     return 0;
 }
