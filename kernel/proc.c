@@ -233,6 +233,7 @@ void userinit(void) {
     p->cwd = namei("/");
 
     p->state = RUNNABLE;
+    p->ready_time = ticks; // record arrival into ready queue
 
     release(&p->lock);
 }
@@ -299,6 +300,7 @@ int fork(void) {
 
     acquire(&np->lock);
     np->state = RUNNABLE;
+    np->ready_time = ticks; // child ready now
     release(&np->lock);
 
     return pid;
@@ -455,14 +457,13 @@ void scheduler(void) {
             uint64 earliest_time = 0xffffffffffffffffULL;
             struct proc *earliest_p = 0;
 
-            // Find process with earliest start time
+            // Find process with earliest ready_time (first-come)
             for (p = proc; p < &proc[NPROC]; p++) {
                 acquire(&p->lock);
-                if (p->state == RUNNABLE && p->start_time < earliest_time) {
-                    // Release previous earliest if found
+                if (p->state == RUNNABLE && p->ready_time < earliest_time) {
                     if (earliest_p)
                         release(&earliest_p->lock);
-                    earliest_time = p->start_time;
+                    earliest_time = p->ready_time;
                     earliest_p = p;
                 } else {
                     release(&p->lock);
@@ -608,6 +609,7 @@ void wakeup(void *chan) {
             acquire(&p->lock);
             if (p->state == SLEEPING && p->chan == chan) {
                 p->state = RUNNABLE;
+                p->ready_time = ticks; // moved to ready queue now
             }
             release(&p->lock);
         }
