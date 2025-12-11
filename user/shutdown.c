@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
         "Why? What did i d- Shutting down...",
     };
 
-    int idx = randd();
+    int idx = 1;
 
     printf("%s\n", msgs[idx]);
 

@@ -25,7 +25,7 @@ extern char trampoline[]; // trampoline.S
 // memory model when using p->parent.
 // must be acquired before any p->lock.
 struct spinlock wait_lock;
-struct spinlock sched_lock;   // serialize scheduler selection
+struct spinlock sched_lock; // serialize scheduler selection
 
 // Allocate a page for each process's kernel stack.
 // Map it high in memory, followed by an invalid
@@ -235,7 +235,7 @@ void userinit(void) {
     p->cwd = namei("/");
 
     p->state = RUNNABLE;
-    p->ready_time = ticks; // record arrival into ready queue
+    p->wait_time = ticks; // record arrival into ready queue
 
     release(&p->lock);
 }
@@ -302,7 +302,8 @@ int fork(void) {
 
     acquire(&np->lock);
     np->state = RUNNABLE;
-    np->ready_time = ticks; // child ready now
+    np->start_time = r_time();
+    np->wait_time = ticks; // child ready now
     release(&np->lock);
 
     return pid;
@@ -332,7 +333,8 @@ void exit(int status) {
 
     // Calculate exectuion time
     if (p->start_time != 0) {
-        p->total_ticks = ticks - p->start_ticks;
+        p->turnaround_time = r_time() - p->start_time;
+        p->end_time = ticks;
     }
 
     // Close all open files.
@@ -392,7 +394,7 @@ int wait(uint64 addr) {
                     struct proc_time pt;
                     pt.pid = pp->pid;
                     pt.start_ticks = pp->start_ticks;
-                    pt.total_ticks = pp->total_ticks;
+                    pt.turnaround_time = pp->turnaround_time;
                     pt.total_cycles = r_time() - pp->start_time;
                     pt.priority = pp->priority;
 
@@ -444,7 +446,7 @@ void scheduler(void) {
 
         target_p = 0;
 
-        acquire(&sched_lock);   // serialize selection across harts
+        acquire(&sched_lock); // serialize selection across harts
 
         if (SCHED_ROUND_ROBIN) {
             // Find first RUNNABLE process
@@ -461,13 +463,13 @@ void scheduler(void) {
             uint64 earliest_time = 0xffffffffffffffffULL;
             struct proc *earliest_p = 0;
 
-            // Find process with earliest ready_time (first-come)
+            // Find process with earliest wait_time (first-come)
             for (p = proc; p < &proc[NPROC]; p++) {
                 acquire(&p->lock);
-                if (p->state == RUNNABLE && p->ready_time < earliest_time) {
+                if (p->state == RUNNABLE && p->wait_time < earliest_time) {
                     if (earliest_p)
                         release(&earliest_p->lock);
-                    earliest_time = p->ready_time;
+                    earliest_time = p->wait_time;
                     earliest_p = p;
                 } else {
                     release(&p->lock);
@@ -498,6 +500,10 @@ void scheduler(void) {
             release(&sched_lock);
             // target_p's lock is already held
             target_p->state = RUNNING;
+
+            uint64 wait_time = r_time() - target_p->wait_time;
+            target_p->total_wait_time += wait_time;
+
             c->proc = target_p;
 
             // Record timing if first time running
@@ -550,7 +556,7 @@ void yield(void) {
     struct proc *p = myproc();
     acquire(&p->lock);
     p->state = RUNNABLE;
-    p->ready_time = ticks;    // requeued now
+    p->wait_time = ticks; // requeued now
     sched();
     release(&p->lock);
 }
@@ -616,7 +622,7 @@ void wakeup(void *chan) {
             acquire(&p->lock);
             if (p->state == SLEEPING && p->chan == chan) {
                 p->state = RUNNABLE;
-                p->ready_time = ticks; // moved to ready queue now
+                p->wait_time = ticks; // moved to ready queue now
             }
             release(&p->lock);
         }

@@ -163,7 +163,7 @@ sys_get_proc_time(void) {
             // Fill the struct
             pt.pid = p->pid;
             pt.start_ticks = p->start_ticks;
-            pt.total_ticks = p->total_ticks;
+            pt.turnaround_time = p->turnaround_time;
             pt.total_cycles = r_time() - p->start_time;
             pt.priority = p->priority;
 
