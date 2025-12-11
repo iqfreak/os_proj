@@ -11,7 +11,6 @@ int main(int argc, char *argv[]) {
     }
 
     int nlines = 10;
-    int flagIdx = -1;
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-n") == 0) {
             char *targetInt = argv[i + 1];
@@ -20,7 +19,6 @@ int main(int argc, char *argv[]) {
                 return -1;
             }
 
-            flagIdx = i;
             nlines = atoi(targetInt);
         }
     }
@@ -30,18 +28,36 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    char *path = flagIdx == 1 ? argv[3] : argv[1];
+    char *path = 0;
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-n") == 0) { i++; continue; }
+        path = argv[i];
+        break;
+    }
 
-    int fd = open(path, O_RDONLY);
-    if (fd < 0) {
-        printf("tail: cannot open %s\n", argv[1]);
-        return -1;
+    int fd;
+    int close_fd = 0;
+    if (!path) {
+        fd = 0; /* stdin */
+    } else {
+        fd = open(path, O_RDONLY);
+        if (fd < 0) {
+            printf("tail: cannot open %s\n", path);
+            return -1;
+        }
+        close_fd = 1;
     }
 
     char buf[600];
     int nread = read(fd, buf, sizeof(buf));
-    int lines = 0;
 
+    // empty file or read err
+    if (nread <= 0) {
+        if (close_fd) close(fd);
+        return 0;
+    }
+
+    int lines = 0;
     int i;
     for (i = nread - 1; i >= 0; --i) {
         if (buf[i] == '\n')
@@ -53,8 +69,12 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    write(1, buf + i, nread - i);
-    close(fd);
+    if (i < 0) i = 0;
+    int len = nread - i;
+    if (len > 0)
+        write(1, buf + i, len);
+
+    if (close_fd) close(fd);
 
     return 0;
 }
