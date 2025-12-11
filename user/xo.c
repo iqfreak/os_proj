@@ -1,7 +1,7 @@
 // todo handle ctrl-c click to exit
-#include "user/user.h"
 #include "kernel/stat.h"
 #include "kernel/types.h"
+#include "user/user.h"
 
 #define B 3
 
@@ -213,10 +213,9 @@ int minimax(int depth, int isMax, int alpha, int beta, int *bestMove) {
 }
 int main(int argc, char *argv[]) {
     if (argc >= 2 && argv[1][0] == '?') {
-        printf("xo, optional -ai for ai mode\n");
+        printf("xo, optional -ai for ai mode, type 'exit' to exit\n");
         return 0;
     }
-    init_board();
 
     int ai_mode = 0;
     for (int i = 1; i < argc; ++i)
@@ -226,56 +225,69 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-    int random_starter = randd() % 2;
-    if (random_starter == 0) {
-        xo_curr = 'X';
-        printf("\nPlayer X starts.\n");
-    } else {
-        xo_curr = 'O'; // AI (or Player 2)
-        printf("\nPlayer O starts.\n");
-    }
+    int playing = 1;
+    while (playing) {
+        init_board();
 
-    char buf[16];
-    while (1) {
-        draw_board();
-
-        int pos;
-        if (ai_mode && xo_curr == 'O') {
-            minimax(0, 1, -1000000, 1000000, &pos);
+        int random_starter = randd() % 2;
+        if (random_starter == 0) {
+            xo_curr = 'X';
+            printf("\nPlayer X starts.\n");
         } else {
-            prompt_player();
+            xo_curr = 'O'; // AI (or Player 2)
+            printf("\nPlayer O starts.\n");
+        }
 
-            int n = read(0, buf, sizeof(buf) - 1);
-            if (n <= 0)
+        char buf[16];
+        while (1) {
+            draw_board();
+
+            int pos;
+            if (ai_mode && xo_curr == 'O') {
+                minimax(0, 1, -1000000, 1000000, &pos);
+            } else {
+                prompt_player();
+
+                int n = read(0, buf, sizeof(buf) - 1);
+                if (n <= 0)
+                    continue;
+                buf[n] = 0;
+
+                // Detect Ctrl-C
+                if (buf[n - 1] == '\n')
+                    buf[n - 1] = 0;
+
+                if (strcmp(buf, "exit") == 0) {
+                    printf("exiting...\n");
+                    playing = 0;
+                    break;
+                }
+
+                pos = simple_atoi(buf);
+            }
+            if (!make_move(pos)) {
+                printf("Invalid move at %d. Try again.\n", pos);
                 continue;
-            buf[n] = 0;
+            }
 
-            pos = simple_atoi(buf);
-        }
-        if (!make_move(pos)) {
-            printf("Invalid move at %d. Try again.\n", pos);
-            continue;
-        }
+            if (win()) {
+                draw_board();
+                out("Player ", 7);
+                write(1, &xo_curr, 1);
+                out(" wins!\n", 7);
+                break;
+            }
 
-        if (win()) {
-            draw_board();
-            out("Player ", 7);
-            write(1, &xo_curr, 1);
-            out(" wins!\n", 7);
-            break;
-        }
+            if (draw()) {
+                draw_board();
+                out("It's a draw!\n", 13);
+                break;
+            }
 
-        if (draw()) {
-            draw_board();
-            out("It's a draw!\n", 13);
-            break;
+            xo_curr = (xo_curr == 'X') ? 'O' : 'X';
         }
-
-        xo_curr = (xo_curr == 'X') ? 'O' : 'X';
+        if (ai_mode)
+            printf("perhaps if you tried harde- nah it won't matter\n");
     }
-    if (ai_mode)
-        printf("perhaps if you tried harde- nah it won't matter\n");
-
-    out("Game over.\n", 11);
     exit(0);
 }

@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
         "Why? What did i d- Shutting down...",
     };
 
-    int idx = getpid() % (sizeof(msgs) / sizeof(msgs[0]));
+    int idx = randd();
 
     printf("%s\n", msgs[idx]);
 
