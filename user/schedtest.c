@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[]) {
     int pid;
-    int k, nprocess = 15;
+    int k, nprocess = 9;
     int z, steps = 100000;
     char buffer_src[1024], buffer_dst[1024];
 
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
         } else if (pid == 0) {
             // Set priority based on process number
             // Lower numbers = higher priority
-            int priority = k % 5; // Priorities 0-4
+            int priority = nprocess - k; // Priorities 0-4
             set_priority(getpid(), priority);
 
             // printf("[pid=%d] created with priority %d\n", getpid(), priority);

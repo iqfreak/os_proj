@@ -187,8 +187,9 @@ sys_set_priority(void) {
     int pid, priority;
     struct proc *p;
 
-    extern struct proc proc[NPROC];
+    extern struct proc proc[NPROC]; // Add this declaration
 
+    // Use argint for both parameters since they're integers
     argint(0, &pid);
     argint(1, &priority);
 
@@ -233,15 +234,13 @@ sys_datetime(void) {
 }
 static uint64 rand_seed = 1;
 
-
 uint64
-sys_randd(void)
-{
-  struct proc *p = myproc();
+sys_randd(void) {
+    struct proc *p = myproc();
 
-  // Mix in the pid to avoid identical sequences from multiple processes
-  rand_seed ^= (p->pid * 0x9e3779b97f4a7c15ULL);
+    // Mix in the pid to avoid identical sequences from multiple processes
+    rand_seed ^= (p->pid * 0x9e3779b97f4a7c15ULL);
 
-  rand_seed = rand_seed * 1103515245 + 12345;
-  return (rand_seed >> 16) & 0x7FFF;
+    rand_seed = rand_seed * 1103515245 + 12345;
+    return (rand_seed >> 16) & 0x7FFF;
 }

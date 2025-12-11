@@ -25,6 +25,7 @@ extern char trampoline[]; // trampoline.S
 // memory model when using p->parent.
 // must be acquired before any p->lock.
 struct spinlock wait_lock;
+struct spinlock sched_lock;   // serialize scheduler selection
 
 // Allocate a page for each process's kernel stack.
 // Map it high in memory, followed by an invalid
@@ -47,6 +48,7 @@ void procinit(void) {
 
     initlock(&pid_lock, "nextpid");
     initlock(&wait_lock, "wait_lock");
+    initlock(&sched_lock, "sched_lock");
     for (p = proc; p < &proc[NPROC]; p++) {
         initlock(&p->lock, "proc");
         p->state = UNUSED;
@@ -442,6 +444,8 @@ void scheduler(void) {
 
         target_p = 0;
 
+        acquire(&sched_lock);   // serialize selection across harts
+
         if (SCHED_ROUND_ROBIN) {
             // Find first RUNNABLE process
             for (p = proc; p < &proc[NPROC]; p++) {
@@ -478,11 +482,10 @@ void scheduler(void) {
             for (p = proc; p < &proc[NPROC]; p++) {
                 acquire(&p->lock);
                 if (p->state == RUNNABLE && p->priority < highest_priority) {
-                    // Release previous highest if found
                     if (highest_p)
                         release(&highest_p->lock);
                     highest_priority = p->priority;
-                    highest_p = p;
+                    highest_p = p; // keep this p->lock held
                 } else {
                     release(&p->lock);
                 }
@@ -491,6 +494,8 @@ void scheduler(void) {
         }
 
         if (target_p) {
+            // selection done, allow other harts to select next proc
+            release(&sched_lock);
             // target_p's lock is already held
             target_p->state = RUNNING;
             c->proc = target_p;
@@ -507,6 +512,7 @@ void scheduler(void) {
             c->proc = 0;
             release(&target_p->lock);
         } else {
+            release(&sched_lock);
             // No runnable processes
             intr_on();
             asm volatile("wfi");
@@ -544,6 +550,7 @@ void yield(void) {
     struct proc *p = myproc();
     acquire(&p->lock);
     p->state = RUNNABLE;
+    p->ready_time = ticks;    // requeued now
     sched();
     release(&p->lock);
 }
