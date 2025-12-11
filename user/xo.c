@@ -4,13 +4,13 @@
 
 #define B 3
 
-char board[B][B];
-char cur = 'X';
+char xo_board[B][B];
+char xo_curr = 'X';
 
 void init_board(void) {
     for (int i = 0; i < B; i++)
         for (int j = 0; j < B; j++)
-            board[i][j] = '1' + i * B + j;
+            xo_board[i][j] = '1' + i * B + j;
 }
 
 void out(const char *s, int len) { write(1, s, len); }
@@ -20,15 +20,15 @@ void draw_board(void) {
     for (int i = 0; i < B; i++) {
         char line[16];
         int p = 0;
-        line[p++] = board[i][0];
+        line[p++] = xo_board[i][0];
         line[p++] = ' ';
         line[p++] = '|';
         line[p++] = ' ';
-        line[p++] = board[i][1];
+        line[p++] = xo_board[i][1];
         line[p++] = ' ';
         line[p++] = '|';
         line[p++] = ' ';
-        line[p++] = board[i][2];
+        line[p++] = xo_board[i][2];
         line[p++] = '\n';
         out(line, p);
         if (i < B - 1)
@@ -39,14 +39,14 @@ void draw_board(void) {
 
 int win(void) {
     for (int i = 0; i < B; i++)
-        if (board[i][0] == board[i][1] && board[i][1] == board[i][2])
+        if (xo_board[i][0] == xo_board[i][1] && xo_board[i][1] == xo_board[i][2])
             return 1;
     for (int j = 0; j < B; j++)
-        if (board[0][j] == board[1][j] && board[1][j] == board[2][j])
+        if (xo_board[0][j] == xo_board[1][j] && xo_board[1][j] == xo_board[2][j])
             return 1;
-    if (board[0][0] == board[1][1] && board[1][1] == board[2][2])
+    if (xo_board[0][0] == xo_board[1][1] && xo_board[1][1] == xo_board[2][2])
         return 1;
-    if (board[0][2] == board[1][1] && board[1][1] == board[2][0])
+    if (xo_board[0][2] == xo_board[1][1] && xo_board[1][1] == xo_board[2][0])
         return 1;
     return 0;
 }
@@ -54,7 +54,7 @@ int win(void) {
 int draw(void) {
     for (int i = 0; i < B; i++)
         for (int j = 0; j < B; j++)
-            if (board[i][j] >= '1' && board[i][j] <= '9')
+            if (xo_board[i][j] >= '1' && xo_board[i][j] <= '9')
                 return 0;
     return 1;
 }
@@ -63,9 +63,9 @@ int make_move(int pos) {
     if (pos < 1 || pos > 9)
         return 0;
     int r = (pos - 1) / B, c = (pos - 1) % B;
-    if (board[r][c] == 'X' || board[r][c] == 'O')
+    if (xo_board[r][c] == 'X' || xo_board[r][c] == 'O')
         return 0;
-    board[r][c] = cur;
+    xo_board[r][c] = xo_curr;
     return 1;
 }
 
@@ -84,7 +84,7 @@ int simple_atoi(const char *s) {
 
 void prompt_player(void) {
     out("Player ", 7);
-    write(1, &cur, 1);
+    write(1, &xo_curr, 1);
     out(", choose (1-9): ", 17);
 }
 
@@ -93,36 +93,36 @@ void prompt_player(void) {
 int evaluate_board() {
     // Check Rows for a win
     for (int i = 0; i < B; i++) {
-        if (board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
-            if (board[i][0] == 'O')
+        if (xo_board[i][0] == xo_board[i][1] && xo_board[i][1] == xo_board[i][2]) {
+            if (xo_board[i][0] == 'O')
                 return 10;
-            else if (board[i][0] == 'X')
+            else if (xo_board[i][0] == 'X')
                 return -10;
         }
     }
 
     // Check Columns for a win (THIS WAS MISSING)
     for (int j = 0; j < B; j++) {
-        if (board[0][j] == board[1][j] && board[1][j] == board[2][j]) {
-            if (board[0][j] == 'O')
+        if (xo_board[0][j] == xo_board[1][j] && xo_board[1][j] == xo_board[2][j]) {
+            if (xo_board[0][j] == 'O')
                 return 10;
-            else if (board[0][j] == 'X')
+            else if (xo_board[0][j] == 'X')
                 return -10;
         }
     }
 
     // Check Diagonals for a win (THIS WAS MISSING)
-    if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
-        if (board[0][0] == 'O')
+    if (xo_board[0][0] == xo_board[1][1] && xo_board[1][1] == xo_board[2][2]) {
+        if (xo_board[0][0] == 'O')
             return 10;
-        else if (board[0][0] == 'X')
+        else if (xo_board[0][0] == 'X')
             return -10;
     }
 
-    if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
-        if (board[0][2] == 'O')
+    if (xo_board[0][2] == xo_board[1][1] && xo_board[1][1] == xo_board[2][0]) {
+        if (xo_board[0][2] == 'O')
             return 10;
-        else if (board[0][2] == 'X')
+        else if (xo_board[0][2] == 'X')
             return -10;
     }
 
@@ -147,14 +147,14 @@ int minimax(int depth, int isMax, int alpha, int beta, int *bestMove) {
         best = -10000;
         for (int i = 0; i < B; i++) {
             for (int j = 0; j < B; j++) {
-                if (board[i][j] != 'X' && board[i][j] != 'O') {
+                if (xo_board[i][j] != 'X' && xo_board[i][j] != 'O') {
 
-                    char backup = board[i][j];
-                    board[i][j] = 'O';
+                    char backup = xo_board[i][j];
+                    xo_board[i][j] = 'O';
 
                     int val = minimax(depth + 1, 0, alpha, beta, bestMove);
 
-                    board[i][j] = backup;
+                    xo_board[i][j] = backup;
 
                     if (val > best) {
                         localBestMove = (i * 3 + 1 + j);
@@ -177,14 +177,14 @@ int minimax(int depth, int isMax, int alpha, int beta, int *bestMove) {
         best = 10000;
         for (int i = 0; i < B; i++) {
             for (int j = 0; j < B; j++) {
-                if (board[i][j] != 'X' && board[i][j] != 'O') {
+                if (xo_board[i][j] != 'X' && xo_board[i][j] != 'O') {
 
-                    char backup = board[i][j];
-                    board[i][j] = 'X';
+                    char backup = xo_board[i][j];
+                    xo_board[i][j] = 'X';
 
                     int val = minimax(depth + 1, 1, alpha, beta, bestMove);
 
-                    board[i][j] = backup;
+                    xo_board[i][j] = backup;
 
                     if (val < best) {
                         localBestMove = (i * 3 + 1 + j);
@@ -228,10 +228,10 @@ int main(int argc, char *argv[]) {
     char buf[16];
     int random_starter = randd() % 2;
     if (random_starter == 0) {
-        cur = 'X';
+        xo_curr = 'X';
         printf("\nPlayer X starts.\n");
     } else {
-        cur = 'O'; // AI (or Player 2)
+        xo_curr = 'O'; // AI (or Player 2)
         printf("\nPlayer O starts.\n");
     }
 
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
         draw_board();
 
         int pos;
-        if (ai_mode && cur == 'O') {
+        if (ai_mode && xo_curr == 'O') {
             minimax(0, 1, -1000000, 1000000, &pos);
         } else {
             prompt_player();
@@ -259,7 +259,7 @@ int main(int argc, char *argv[]) {
         if (win()) {
             draw_board();
             out("Player ", 7);
-            write(1, &cur, 1);
+            write(1, &xo_curr, 1);
             out(" wins!\n", 7);
             break;
         }
@@ -270,7 +270,7 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        cur = (cur == 'X') ? 'O' : 'X';
+        xo_curr = (xo_curr == 'X') ? 'O' : 'X';
     }
     if (ai_mode)
         printf("told ya you can't win >:P\n");
