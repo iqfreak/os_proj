@@ -235,7 +235,9 @@ void userinit(void) {
     p->cwd = namei("/");
 
     p->state = RUNNABLE;
-    p->wait_time = ticks; // record arrival into ready queue
+    p->wait_time_ticks = ticks; // record arrival into ready queue
+    p->start_time = r_time();
+    p->wait_time = r_time();
 
     release(&p->lock);
 }
@@ -309,12 +311,14 @@ int fork(void) {
 
     acquire(&np->lock);
     np->state = RUNNABLE;
+    //
     np->start_time = r_time();
+    np->wait_time = np->start_time;
     //
-    np->fixed_start_time = r_time();
-    np->wait_time = r_time();
-    //
-    printf("\nFROM FORK: %lu\n", np->start_time);
+
+
+
+    printf("\nFORK: PID %d FORKED AT %lu\n", np->pid, np->start_time);
     release(&np->lock);
 
     return pid;
@@ -344,8 +348,9 @@ void exit(int status) {
 
     // Calculate exectuion time
     if (p->start_time != 0) {
-        p->turnaround_time = r_time() - p->start_time;
         p->end_time = r_time();
+        p->turnaround_time = p->end_time - p->start_time;
+        printf("\nEXIT: PID %d BECAME ZOMBIE AT %lu\n", p->pid, p->end_time);
     }
 
     // Close all open files.
@@ -407,9 +412,10 @@ int wait(uint64 addr) {
                     // Create timing struct to return to user
                     pt.pid = pp->pid;
                     pt.priority = pp->priority;
-                    pt.fixed_start_time = pp->fixed_start_time;
+                    pt.start_time = pp->start_time;
                     pt.turnaround_time = pp->turnaround_time;
                     pt.wait_time = pp->wait_time;
+                    pt.total_wait_time = pp->total_wait_time;
                     pt.end_time = pp->end_time;
 
                     // Copy timing struct to user space
@@ -462,12 +468,10 @@ void scheduler(void) {
         acquire(&sched_lock); // serialize selection across harts
 
         if (SCHED_ROUND_ROBIN) {
-            // Find first RUNNABLE process
             for (p = proc; p < &proc[NPROC]; p++) {
                 acquire(&p->lock);
                 if (p->state == RUNNABLE) {
                     target_p = p;
-                    // Keep the lock held for the target process
                     break;
                 }
                 release(&p->lock);
@@ -514,7 +518,11 @@ void scheduler(void) {
             // target_p's lock is already held
             target_p->state = RUNNING;
 
-            target_p->wait_time = r_time() - target_p->start_time;
+            uint64 now = r_time();
+            target_p->total_wait_time += now - target_p->wait_time;
+            target_p->wait_time = now;
+
+            printf("\nSCHEDULER: PID %d BECAME RUNNING %lu\n", target_p->pid, now);
 
             c->proc = target_p;
 
@@ -567,7 +575,8 @@ void yield(void) {
     struct proc *p = myproc();
     acquire(&p->lock);
     p->state = RUNNABLE;
-    p->wait_time = ticks; // requeued now
+    p->wait_time = r_time();
+    printf("\nYIELD: PID %d BECAME WAITING AT %lu\n", p->pid, p->wait_time);
     sched();
     release(&p->lock);
 }
@@ -633,7 +642,7 @@ void wakeup(void *chan) {
             acquire(&p->lock);
             if (p->state == SLEEPING && p->chan == chan) {
                 p->state = RUNNABLE;
-                p->wait_time = ticks; // moved to ready queue now
+                p->wait_time = r_time(); // moved to ready queue now
             }
             release(&p->lock);
         }

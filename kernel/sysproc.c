@@ -162,8 +162,7 @@ sys_get_proc_time(void) {
         if (p->pid == pid && p->state != UNUSED) {
             // Fill the struct
             pt.pid = p->pid;
-            // pt.start_time = p->start_time;
-            pt.fixed_start_time = p->fixed_start_time;
+            pt.start_time = p->start_time;
             pt.turnaround_time = p->turnaround_time;
             pt.priority = p->priority;
             pt.wait_time = p->wait_time;

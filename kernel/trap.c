@@ -1,6 +1,6 @@
-const int SCHED_ROUND_ROBIN = 0;
+const int SCHED_ROUND_ROBIN = 1;
 const int SCHED_FCFS = 0;
-const int SCHED_PRIORITY = 1;
+const int SCHED_PRIORITY = 0;
 
 #include "defs.h"
 #include "memlayout.h"
@@ -79,7 +79,7 @@ void usertrap(void) {
         exit(-1);
 
     // give up the CPU if this is a timer interrupt.
-    if (which_dev == 2 && (!SCHED_FCFS))
+    if (which_dev == 2 && !SCHED_FCFS)
         yield();
 
     usertrapret();
@@ -149,7 +149,7 @@ void kerneltrap() {
     }
 
     // give up the CPU if this is a timer interrupt.
-    if (which_dev == 2 && myproc() != 0 && (!SCHED_FCFS))
+    if (which_dev == 2 && myproc() != 0 && !SCHED_FCFS)
         yield();
 
     // the yield() may have caused some traps to occur,
